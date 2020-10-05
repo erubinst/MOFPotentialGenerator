@@ -11,8 +11,6 @@ k = 1/(4*np.pi*8.8*(10**-12))
 # print(k)
 # charge of electron in coulombs
 qe = 1.6*10**-19
-# boltzmann constant to go from J to K
-kB = 1.4*(10**-23)
 # alpha is in unites of Angstroms cubed
 alpha = 0.675
 
@@ -22,15 +20,19 @@ def magnitude(r,rspace):
     # 3D distance formula
     return np.sqrt((r[0]-rspace[0])**2+(r[1]-rspace[1])**2+(r[2]-rspace[2])**2)
 
-# sigma is in Angstroms
-def sigma(atomSig):
-    return (2.571+atomSig)/2
+def beta(C,T):
+    return 1/(C*T)
+# kB units in J*K^-1
+kB = (1.38*10**-23)
+# in units of J*s
+hbar = (1.054*10**-34)
 
-# epsilon is in K
-def epsilon(atomEps):
-    return np.sqrt(22.14*atomEps)
+def deBroglieCoeff(isotope,T):
+    return ((6*isotope.mass)/(beta(kB,T)*hbar**2))/(10**20)
 
 def secondDeriv(f,x,dx):
     def firstDeriv(xx):
         return derivative(f,xx,dx)
     return derivative(firstDeriv, x, dx)
+
+

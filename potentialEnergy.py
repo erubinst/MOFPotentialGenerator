@@ -61,4 +61,4 @@ def d(x):
 def Correction(mu,r,T):
     return ULJ(r,epsilon,sigma) + prefac1(mu,T)*((secondDerivCheck(r)+2*firstDerivCheck(r)/r)+prefac2(mu,T)*(15*firstDerivCheck(r)/(r**3)+(4*thirdDerivCheck(r)/r)+fourthDerivCheck(r)))
 
-print(prefac1(muH,77)*firstDerivCheck(6)/6)
+# print(prefac1(muH,77)*firstDerivCheck(6)/6)

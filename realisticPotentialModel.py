@@ -28,7 +28,7 @@ def Efield(isotope, atoms):
         Ez += chargeFactor*correctionFactor[2]
     # return (Ex, Ey, Ez)
     # print(Ez)
-    #print(Ex**2+Ey**2+Ez**2)
+    # print(Ex**2+Ey**2+Ez**2)
     return (Ex**2+Ey**2+Ez**2)
 
 
@@ -73,3 +73,14 @@ def UFH(potentialType, xArray, yArray, zArray, atoms, source, T):
                 normalizationFactor += decayFactor
     return u_sum/normalizationFactor
 
+# def UFH(potentialType, xArray, yArray, zArray, atoms, source, T):
+#     u_sum = 0
+#     normalizationFactor = 0
+#     isotope = cp.copy(source)
+#     for x, y, z in it.product(xArray, yArray, zArray):
+#         isotope.setPoint(x, y, z)
+#         u_classical = U(potentialType, isotope, atoms)
+#         decayFactor = np.exp(-uT.deBroglieCoeff(isotope,T)*isotope.magnitude(source))
+#         u_sum += u_classical*decayFactor
+#         normalizationFactor += decayFactor
+#     return u_sum/normalizationFactor

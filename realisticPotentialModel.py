@@ -15,21 +15,28 @@ def correctionFactors(HAtom, AAtom, R):
     return(xCorrection, yCorrection, zCorrection)
 
 
-def Efield(isotope, atom):
-    mag = atom.magnitude(isotope)
-    correctionFactor = correctionFactors(isotope, atom, mag)
-    chargeFactor = atom.charge/(mag**2)
-    Ex = chargeFactor*correctionFactor[0]
-    Ey = chargeFactor*correctionFactor[1]
-    Ez = chargeFactor*correctionFactor[2]
+def Efield(isotope, atoms):
+    Ex = 0
+    Ey = 0
+    Ez = 0
+    for atom in atoms:
+        R = atom.magnitude(isotope)
+        correctionFactor = correctionFactors(isotope, atom, R)
+        chargeFactor = atom.charge/(R**2)
+        Ex += chargeFactor*correctionFactor[0]
+        Ey += chargeFactor*correctionFactor[1]
+        Ez += chargeFactor*correctionFactor[2]
     # return (Ex, Ey, Ez)
+    # print(Ez)
+    #print(Ex**2+Ey**2+Ez**2)
     return (Ex**2+Ey**2+Ez**2)
 
 
 # Different ways to compute potential
-def Upol(isotope, atom):
+def Upol(isotope, atoms):
     # return -((1/uT.kB)*(10**10)*uT.k*((1.6*10**-19)**2)*(0.675/2)*eF.Efield(isotope, r, charges, limit1, limit2))
-    return -(0.675/2)*Efield(isotope, atom)
+    # print(-((1/uT.kB)*(10**10)*uT.k*((uT.qe)**2)*(0.675/2)*Efield(isotope, atoms)))
+    return -((1/uT.kB)*(10**10)*uT.k*((uT.qe)**2)*(0.675/2)*Efield(isotope, atoms))
 
 
 def Ulj(isotope, atoms):
@@ -51,6 +58,7 @@ def U(potentialType, isotope, atoms):
         return Ulj(isotope, atoms) + Upol(isotope, atoms)
 
 
+# computes the average of the classical potential weighted by a gaussian
 def UFH(potentialType, xArray, yArray, zArray, atoms, source, T):
     u_sum = 0
     normalizationFactor = 0

@@ -1,31 +1,29 @@
 import atom as at
-import potentialEnergy as pot
 import realisticPotentialModel as pm
 import numpy as np
-from scipy.misc import derivative
 import matplotlib.pyplot as plt
 from matplotlib import cm
 import copy as cp
-import utilities as uT
-import point as pt
 
 
-# Source is for choosing hydrogen or deuterium and atoms is the list of atoms iMOF
 def UvZPlot(potentialType, atoms, T):
-    z = np.linspace(3, 5)
-    x = np.linspace(-3, 3)
-    y = np.linspace(-3, 3)
+    z = np.linspace(2,4,40)
+    x = np.linspace(-3, 3,40)
+    y = np.linspace(-3, 3,40)
 
+    # Source is for choosing hydrogen or deuterium and atoms is the list of atoms in MOF
     def UzInternal(z, quantump, source):
-        # using 3 because just looking at O1 for simple case - will make gradually more complicated as time goes on
         minimum = float("inf")
         potentials = []
+        # loads in isotope object
         isotope = cp.copy(source)
         for val in z:
+            # sets point of isotope to look at all points along z axis
             isotope.setPoint(0, 0, val)
             if quantump:
                 u_sum = pm.UFH(potentialType, x, y, z, atoms, isotope, T)
             else:
+                # classsical version
                 u_sum = pm.U(potentialType, isotope, atoms)
             if u_sum < minimum:
                 minimum = u_sum
@@ -70,6 +68,7 @@ def UvZPlot3D(potentialType, source, atoms, zval, T):
                 if quantump:
                     u_sum = pm.UFH(potentialType, x, y, z, atoms, isotope, T)
                 else:
+                    # classical version
                     u_sum = pm.U(potentialType, isotope, atoms)
                 u_sum = min(u_sum, 4000)
                 if u_sum < minimum:
@@ -88,7 +87,7 @@ def UvZPlot3D(potentialType, source, atoms, zval, T):
     ax.set_xlabel("x axis distance (angstroms)")
     ax.set_ylabel("y axis distance (angstroms)")
     ax.set_zlabel(potentialType + " (K)")
-    ax.text2D(0, 1, "U min: " + str(int(Z[1])) + "\nPoint: (" + str(round(Z[2], 3)) + "," + str(round(Z[3], 3)) + "," + str(round(zval,2)) + ")", transform=ax.transAxes,bbox=dict(facecolor='red', alpha=0.5))
+    ax.text2D(0, 1, "U min: " + str(int(Z[1])) + "\nPoint: (" + str(round(Z[2], 3)) + "," + str(round(Z[3], 3)) + "," + str(round(zval,2)) + ")", transform=ax.transAxes, bbox=dict(facecolor='red', alpha=0.5))
     plt.show()
 
 
@@ -96,5 +95,5 @@ atoms = at.atoms
 hydrogen = at.hydrogen
 deuterium = at.deuterium
 
-# UvZPlot("Ulj", atoms, 77)
-UvZPlot3D("Ulj", at.hydrogen, atoms, 3.3, 77)
+UvZPlot("Upol", atoms, 77)
+# UvZPlot3D("Ulj", at.hydrogen, atoms, 3.3, 77)

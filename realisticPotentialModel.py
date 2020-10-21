@@ -71,7 +71,7 @@ def UFH(potentialType, xArray, yArray, zArray, atoms, source, T):
                 decayFactor = np.exp(-uT.deBroglieCoeff(isotope,T)*isotope.magnitude(source))
                 u_sum += u_classical*decayFactor
                 normalizationFactor += decayFactor
-    return u_sum/normalizationFactor
+    return (u_sum/normalizationFactor, normalizationFactor)
 
 # def UFH(potentialType, xArray, yArray, zArray, atoms, source, T):
 #     u_sum = 0

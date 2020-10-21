@@ -14,6 +14,8 @@ qe = 1.6*10**-19
 # alpha is in unites of Angstroms cubed
 alpha = 0.675
 
+qe = (1.6*10**-19)
+
 # coordinates - Zn:0-2, O1:3, O2:4-9, C1:10-12
 # gives distance - taken from rosnowCode
 def magnitude(r,rspace):

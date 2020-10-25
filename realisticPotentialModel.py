@@ -1,6 +1,7 @@
 import copy as cp
 import numpy as np
 import utilities as uT
+import time
 
 # Electric field computation
 def correctionFactors(HAtom, AAtom, R):
@@ -71,7 +72,7 @@ def UFH(potentialType, xArray, yArray, zArray, atoms, source, T):
                 decayFactor = np.exp(-uT.deBroglieCoeff(isotope,T)*isotope.magnitude(source))
                 u_sum += u_classical*decayFactor
                 normalizationFactor += decayFactor
-    return (u_sum/normalizationFactor, normalizationFactor)
+    return (u_sum/normalizationFactor)
 
 # def UFH(potentialType, xArray, yArray, zArray, atoms, source, T):
 #     u_sum = 0
@@ -84,3 +85,53 @@ def UFH(potentialType, xArray, yArray, zArray, atoms, source, T):
 #         u_sum += u_classical*decayFactor
 #         normalizationFactor += decayFactor
 #     return u_sum/normalizationFactor
+
+def generate2DPotentialData(potentialType, xArray, yArray, zArray, atoms, source, quantump, T):
+    start = time.perf_counter()
+    minPotential = float("inf")
+    zval_at_minPotential = 0
+    potentials = []
+    # loads in isotope object
+    isotope = cp.copy(source)
+    for val in zArray:
+        # sets point of isotope to look at all points along z axis
+        isotope.setPoint(0, 0, val)
+        if quantump:
+            u_sum = UFH(potentialType, xArray, yArray, zArray, atoms, isotope, T)
+        else:
+            # classsical version
+            u_sum = U(potentialType, isotope, atoms)
+        if u_sum < minPotential:
+            minPotential = u_sum
+            zval_at_minPotential = val
+        potentials.append(u_sum)
+    end = time.perf_counter()
+    elapsedTime = (end-start)*(1/(10**3))
+    return (potentials, zval_at_minPotential, minPotential, elapsedTime)
+
+def generate3DPotentialData(potentialType, xArray, yArray, zArray, zval, atoms, source, quantump, T):
+    start = time.perf_counter()
+    potentials = []
+    minPotential = float("inf")
+    yval_at_minPotential = 0
+    xval_at_minPotential = 0
+    isotope = cp.copy(source)
+    for yval in yArray:
+        row_potentials = []
+        for xval in xArray:
+            isotope.setPoint(xval, yval, zval)
+            if quantump:
+                u_sum = UFH(potentialType, xArray, yArray, zArray, atoms, isotope, T)
+            else:
+                # classical version
+                u_sum = U(potentialType, isotope, atoms)
+            u_sum = min(u_sum, 4000)
+            if u_sum < minPotential:
+                minPotential = u_sum
+                yval_at_minPotential = yval
+                xval_at_minPotential = xval
+            row_potentials.append(u_sum)
+        potentials.append(row_potentials)
+    end = time.perf_counter()
+    elapsedTime = (end-start)*(1/(10**3))
+    return (potentials, xval_at_minPotential, yval_at_minPotential, minPotential, elapsedTime)

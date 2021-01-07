@@ -2,6 +2,7 @@ import copy as cp
 import numpy as np
 import utilities as uT
 import time
+import atom as at
 
 # Electric field computation
 def correctionFactors(HAtom, AAtom, R):
@@ -97,7 +98,7 @@ def generate2DPotentialData(potentialType, xArray, yArray, zArray, atoms, source
         # sets point of isotope to look at all points along z axis
         isotope.setPoint(0, 0, val)
         if quantump:
-            u_sum = UFH(potentialType, xArray, yArray, zArray, atoms, isotope, T)
+            u_sum =UFH(potentialType, xArray, yArray, zArray, atoms, isotope, T)
         else:
             # classsical version
             u_sum = U(potentialType, isotope, atoms)
@@ -108,6 +109,52 @@ def generate2DPotentialData(potentialType, xArray, yArray, zArray, atoms, source
     end = time.perf_counter()
     elapsedTime = (end-start)*(1/(10**3))
     return (potentials, zval_at_minPotential, minPotential, elapsedTime)
+
+def generate2DXPotentialData(potentialType, xArray, yArray, zArray, atoms, source, quantump, T,zval_at_min):
+    start = time.perf_counter()
+    minPotential = float("inf")
+    xval_at_minPotential = 0
+    potentials = []
+    # loads in isotope object
+    isotope = cp.copy(source)
+    for val in xArray:
+        # sets point of isotope to look at all points along z axis
+        isotope.setPoint(val, 0, zval_at_min)
+        if quantump:
+            u_sum =UFH(potentialType, xArray, yArray, zArray, atoms, isotope, T)
+        else:
+            # classsical version
+            u_sum = U(potentialType, isotope, atoms)
+        if u_sum < minPotential:
+            minPotential = u_sum
+            xval_at_minPotential = val
+        potentials.append(u_sum)
+    end = time.perf_counter()
+    elapsedTime = (end-start)*(1/(10**3))
+    return (potentials, xval_at_minPotential, minPotential, elapsedTime)
+
+def generate2DYPotentialData(potentialType, xArray, yArray, zArray, atoms, source, quantump, T,zval_at_min):
+    start = time.perf_counter()
+    minPotential = float("inf")
+    yval_at_minPotential = 0
+    potentials = []
+    # loads in isotope object
+    isotope = cp.copy(source)
+    for val in yArray:
+        # sets point of isotope to look at all points along z axis
+        isotope.setPoint(0, val, zval_at_min)
+        if quantump:
+            u_sum =UFH(potentialType, xArray, yArray, zArray, atoms, isotope, T)
+        else:
+            # classsical version
+            u_sum = U(potentialType, isotope, atoms)
+        if u_sum < minPotential:
+            minPotential = u_sum
+            yval_at_minPotential = val
+        potentials.append(u_sum)
+    end = time.perf_counter()
+    elapsedTime = (end-start)*(1/(10**3))
+    return (potentials, yval_at_minPotential, minPotential, elapsedTime)
 
 def generate3DPotentialData(potentialType, xArray, yArray, zArray, zval, atoms, source, quantump, T):
     start = time.perf_counter()
@@ -135,3 +182,16 @@ def generate3DPotentialData(potentialType, xArray, yArray, zArray, zval, atoms, 
     end = time.perf_counter()
     elapsedTime = (end-start)*(1/(10**3))
     return (potentials, xval_at_minPotential, yval_at_minPotential, minPotential, elapsedTime)
+
+
+def UzHydrogen(z):
+    isotope = at.deuterium
+    isotope.setPoint(0,0,z)
+    return UFH("U", np.linspace(-3,3), np.linspace(-3,3), np.linspace(3,4), at.atoms, isotope, 22)
+
+#print(generate2DPotentialData("U", np.linspace(-3,3), np.linspace(-3,3), np.linspace(2.4,6), at.atoms, at.hydrogen, False, 22))
+
+#print(generate2DXPotentialData("U", np.linspace(-3,3), np.linspace(-3,3), np.linspace(2.4,6), at.atoms, at.hydrogen, False, 22, 3.04))
+
+# print(np.linspace(-3,3))
+

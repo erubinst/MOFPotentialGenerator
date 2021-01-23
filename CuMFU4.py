@@ -1,73 +1,55 @@
-import matplotlib.pyplot as plt
+import SE as se
+import CuUtilities as ct
+import atom as at
 
-def readinPotential(file):
-    file1 = open(file, "r")
-    distance = []
-    potential = []
-    numlist = file1.read().split()
-    for i in range(len(numlist)):
-        numlist[i] = float(numlist[i])
-        if i%2 == 0:
-            distance.append(numlist[i])
-        else:
-            numlist[i] = numlist[i]/.008314
-            potential.append(numlist[i])
-    file1.close()
-    return distance,potential
+def generateWavefunction(potentialFile, distanceFile, isotope, GSE, FEE):
+    potential = ct.readinFile(potentialFile, False)
+    distance = ct.readinFile(distanceFile, False)
+    psiGS = se.SE(potential, 0, 0.001, distance, isotope.mass, GSE)
+    psiFE = se.SE(potential, 0, 0.001, distance, isotope.mass, FEE)
+    probGS = ct.squaredlist(psiGS)
+    probFE = ct.squaredlist(psiFE)
+    areaGS = sum(probGS[0:184])
+    areaFE = sum(probFE[0:184])
+    #print(areaGS)
+    #print(areaFE)
+    ct.normLst(psiGS, areaGS)
+    ct.normLst(psiFE, areaFE)
+    ct.normLst(probGS, areaGS)
+    ct.normLst(probFE, areaFE)
+    #print(sum(probGS))
+    #print(sum(probFE))
+    return (psiGS, probGS, psiFE, probFE)
 
-def readinFile(file, potp):
-    file1 = open(file, "r")
-    newlst = []
-    numList = file1.read().split()
-    for i in range(len(numList)):
-        numList[i] = float(numList[i])
-        if potp == True:
-            numList[i] = numList[i]/.008314
-        newlst.append(numList[i])
-    file1.close()
-    return newlst
+def main():
+    #psiGSH,probGSH, psiFEH, probFEH = generateWavefunction("potential01.txt", "distance01.txt", at.deuterium, -2312.186611170497, -1100.063)
+    psiGSH,probGSH, psiFEH, probFEH = generateWavefunction("B3lyp.txt", "distance2.txt", at.deuterium ,-4592.6687261555,-3495.8614957392012457)
+    ct.makeFile("B3psiGSD.txt", psiGSH)
+    ct.makeFile("B3probGSD.txt", probGSH)
+    ct.makeFile("B3psiFED.txt", psiFEH)
+    ct.makeFile("B3probFED.txt", probFEH)
 
-#print(readinFile("distance01.txt", False))
+#main()
 
-def findMinimum(dist, pot):
-    minimumPot = 100000
-    minimumDist = 0
-    for i in range(len(pot)):
-        if pot[i] < minimumPot:
-            minimumPot = pot[i]
-            minimumDist = dist[i]
-    return minimumDist, minimumPot
+def bumpPercentage(potentialFile, distanceFile, isotope, GSE, FEE, startPoint, endPoint):
+    probFE = generateWavefunction(potentialFile, distanceFile, isotope, GSE, FEE)[3]
+    bumpPercent = ct.sumLstSection(probFE, startPoint, endPoint)
+    return bumpPercent
 
-
-def plotPotential(potentialFile):
-    dist = readinPotential(potentialFile)[0]
-    pot = readinPotential(potentialFile)[1]
-    minDist = findMinimum(dist, pot)[0]
-    minPot = findMinimum(dist, pot)[1]
-    plt.plot(dist, pot)
-    plt.xlabel("Distance (angstroms)")
-    plt.ylabel("Potential (K)")
-    plt.text(0.02, .985, "Dist at Min (Angstroms):" + str(minDist), transform=plt.gcf().transFigure, va='top', bbox=dict(facecolor='red', alpha=0.5))
-    plt.text(0.02, .93, "Potential Min (K):" + str(minPot), transform=plt.gcf().transFigure, va='top', bbox=dict(facecolor='red', alpha=0.5))
-    plt.show()
-
-def plotInterpolatedPotential(distFile, potFile):
-    dist = readinFile(distFile, False)
-    pot = readinFile(potFile,True)
-    minDist = findMinimum(dist, pot)[0]
-    minPot = findMinimum(dist, pot)[1]
-    plt.plot(dist, pot)
-    plt.xlabel("Distance (angstroms)")
-    plt.ylabel("Potential (K)")
-    plt.text(0.02, .985, "Dist at Min (Angstroms):" + str(minDist), transform=plt.gcf().transFigure, va='top', bbox=dict(facecolor='red', alpha=0.5))
-    plt.text(0.02, .93, "Potential Min (K):" + str(minPot), transform=plt.gcf().transFigure, va='top', bbox=dict(facecolor='red', alpha=0.5))
-    plt.show()
+#print(bumpPercentage("potential01.txt", "distance01.txt", at.hydrogen, -2101.47875, -907.6, 0, 30))
+#print(bumpPercentage("potential01.txt", "distance01.txt", at.hydrogen, -2101.47875, -907.6, 31, 74))
+#print(bumpPercentage("potential01.txt", "distance01.txt", at.hydrogen, -2101.47875, -907.6, 75, 123))
+#print(bumpPercentage("potential01.txt", "distance01.txt", at.hydrogen, -2101.47875, -907.6, 124, 213))
 
 
-probGS = readinFile("probGS.txt", False)
-probFE = readinFile("probFE.txt", False)
+#print(bumpPercentage("potential01.txt", "distance01.txt", at.deuterium, -2312.18661117049, -1100.063, 0, 25))
+#print(bumpPercentage("potential01.txt", "distance01.txt", at.deuterium, -2312.18661117049, -1100.063, 26, 48))
+#print(bumpPercentage("potential01.txt", "distance01.txt", at.deuterium, -2312.18661117049, -1100.063, 49, 114))
+#print(bumpPercentage("potential01.txt", "distance01.txt", at.deuterium, -2312.18661117049, -1100.063, 115, 213))
 
-areaGS = sum(probGS)
-areaFE = sum(probFE)
+#print(bumpPercentage("B3lyp.txt", "distance2.txt", at.hydrogen, -4350.08496862226, -2903.24140354, 0, 43))
+#print(bumpPercentage("B3lyp.txt", "distance2.txt", at.hydrogen, -4350.08496862226, -2903.24140354, 43, 228))
 
-print(areaGS)
+print(bumpPercentage("B3lyp.txt", "distance2.txt", at.deuterium, -4592.6687261555, -3495.8614957392, 0, 40))
+
+print(bumpPercentage("B3lyp.txt", "distance2.txt", at.deuterium, -4592.6687261555, -3495.8614957392,41, 183))

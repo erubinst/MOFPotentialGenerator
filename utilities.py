@@ -1,6 +1,7 @@
 # Common parameters
 import numpy as np
 from scipy.misc import derivative
+import atom as at
 
 
 # parameters in the electrostatic potential for H2
@@ -37,4 +38,9 @@ def secondDeriv(f,x,dx):
         return derivative(f,xx,dx)
     return derivative(firstDeriv, x, dx)
 
+#print(deBroglieCoeff(at.hydrogen,300))
 
+def f(x):
+    return x**2
+
+#print(secondDeriv(f,2,0.1))

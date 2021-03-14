@@ -7,6 +7,8 @@ import atom as at
 # Electric field computation
 def correctionFactors(HAtom, AAtom, R):
     X = (HAtom.x-AAtom.x)
+    #print("x", X)
+    #print("R", R)
     Y = (HAtom.y-AAtom.y)
     Z = (HAtom.z-AAtom.z)
 
@@ -29,8 +31,8 @@ def Efield(isotope, atoms):
         Ey += chargeFactor*correctionFactor[1]
         Ez += chargeFactor*correctionFactor[2]
     # return (Ex, Ey, Ez)
-    # print(Ez)
-    # print(Ex**2+Ey**2+Ez**2)
+    # print("efield",Ex**2+Ey**2+Ez**2)
+    # print("R", R)
     return (Ex**2+Ey**2+Ez**2)
 
 
@@ -38,7 +40,8 @@ def Efield(isotope, atoms):
 def Upol(isotope, atoms):
     # return -((1/uT.kB)*(10**10)*uT.k*((1.6*10**-19)**2)*(0.675/2)*eF.Efield(isotope, r, charges, limit1, limit2))
     # print(-((1/uT.kB)*(10**10)*uT.k*((uT.qe)**2)*(0.675/2)*Efield(isotope, atoms)))
-    return -((1/uT.kB)*(10**10)*uT.k*((uT.qe)**2)*(0.675/2)*Efield(isotope, atoms))
+    # print("upol", -((1/uT.kB)*(10**10)*uT.k*((uT.qe)**2)*(0.675/2)*Efield(isotope, atoms)))
+    return (-((1/uT.kB)*(10**10)*uT.k*((uT.qe)**2)*(0.675/2)*Efield(isotope, atoms)))
 
 
 def Ulj(isotope, atoms):
@@ -48,6 +51,7 @@ def Ulj(isotope, atoms):
         epsilon = atom.jointEpsilon(isotope)
         sigma = atom.jointSigma(isotope)
         Ulj += 4*epsilon*((sigma/R)**12-(sigma/R)**6)
+    # print("ulj", Ulj)
     return Ulj
 
 
@@ -57,6 +61,7 @@ def U(potentialType, isotope, atoms):
     elif potentialType == "Ulj":
         return Ulj(isotope, atoms)
     elif potentialType == "U":
+        #print("fullU", Ulj(isotope, atoms) + Upol(isotope, atoms))
         return Ulj(isotope, atoms) + Upol(isotope, atoms)
 
 
@@ -95,6 +100,7 @@ def generate2DPotentialData(potentialType, xArray, yArray, zArray, atoms, source
     # loads in isotope object
     isotope = cp.copy(source)
     for val in zArray:
+        print(val)
         # sets point of isotope to look at all points along z axis
         isotope.setPoint(0, 0, val)
         if quantump:
@@ -189,9 +195,8 @@ def UzHydrogen(z):
     isotope.setPoint(0,0,z)
     return UFH("U", np.linspace(-3,3), np.linspace(-3,3), np.linspace(3,4), at.atoms, isotope, 22)
 
-#print(generate2DPotentialData("U", np.linspace(-3,3), np.linspace(-3,3), np.linspace(2.4,6), at.atoms, at.hydrogen, False, 22))
+#print(generate2DPotentialData("U", np.linspace(-3,3,100), np.linspace(-3,3,100), np.linspace(2.4,6,150), at.atoms, at.hydrogen, False, 22))
 
 #print(generate2DXPotentialData("U", np.linspace(-3,3), np.linspace(-3,3), np.linspace(2.4,6), at.atoms, at.hydrogen, False, 22, 3.04))
 
-# print(np.linspace(-3,3))
-
+#print(np.linspace(2.4,6,150))

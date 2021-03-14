@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 
 def UvZPlot(potentialTypes, atoms, T):
-    z = np.linspace(2, 5)
+    z = np.linspace(1.8, 5)
     x = np.linspace(-3, 3)
     y = np.linspace(-3, 3)
     minimums = []
@@ -30,8 +30,8 @@ def UvZPlot(potentialTypes, atoms, T):
             return pots
 
         plt.plot(z, UzClassical(z), color="black", label="Classical " + pType)
-        plt.plot(z, UzHFH(z), color="red", label="H2 " + pType)
-        plt.plot(z, UzDFH(z), color="green", label="D2 " + pType)
+        #plt.plot(z, UzHFH(z), color="red", label="H2 " + pType)
+        #plt.plot(z, UzDFH(z), color="green", label="D2 " + pType)
     plt.xlabel("z axis distance (angstroms)")
     plt.ylabel("Potential (K)")
     lastMinIndex = len(minimums) - 1
@@ -114,8 +114,8 @@ def UvYPlot(potentialTypes, atoms, T,zmin):
             return pots
 
         plt.plot(y, UyClassical(y), color="black", label="Classical " + pType)
-        plt.plot(y, UyHFH(z), color="red", label="H2 " + pType)
-        plt.plot(y, UyDFH(z), color="green", label="D2 " + pType)
+        #plt.plot(y, UyHFH(z), color="red", label="H2 " + pType)
+        #plt.plot(y, UyDFH(z), color="green", label="D2 " + pType)
     plt.xlabel("y axis distance (angstroms)")
     plt.ylabel("Potential (K)")
     lastMinIndex = len(minimums) - 1
@@ -151,6 +151,6 @@ atoms = at.atoms
 hydrogen = at.hydrogen
 deuterium = at.deuterium
 
-#UvZPlot(["U"], atoms, 22)
-#UvZPlot3D("U", at.hydrogen, atoms, 3.04, False, 77)#UvXPlot(["U"], atoms, 22, 3.4)
-UvYPlot(["U"], atoms, 22, 3.4)
+#UvZPlot(["U"], at.MOF74AtomsJustMg, 77)
+UvZPlot3D("U", at.hydrogen, atoms, 3.04, True, 77)#UvXPlot(["U"], atoms, 22, 3.4)
+#UvYPlot(["U"], atoms, 22, 3.4)
